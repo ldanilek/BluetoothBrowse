@@ -123,8 +123,8 @@ class BluetoothReceiver: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
                 }
             } else if characteristic.UUID.isEqual(self.dataUUID) {
                 //self.data.appendData(data)
-                status("Fetched this much data: \(data.length)")
                 if data.length == 0 {
+                    status("Fetched file \(url!) of size \(self.buildingData.length)")
                     self.delegate?.dataReceived(self.buildingData.copy() as! NSData, url: url!)
                     self.buildingData = NSMutableData()
                 } else {

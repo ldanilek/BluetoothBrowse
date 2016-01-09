@@ -111,12 +111,12 @@ class BluetoothHotspot: NSObject, CBPeripheralManagerDelegate {
         let sent = self.peripheralManager.updateValue(chunk, forCharacteristic: self.dataCharacteristic, onSubscribedCentrals: nil)
         if sent {
             self.dataOffset += chunkSize
-            status("Sent chunk of size \(chunkSize)")
             if chunkSize > 0 {
                 self.sendChunkedData()
+            } else {
+                status("Done sending data")
             }
         } else {
-            status("Sending chunk of size \(chunkSize) failed")
             waitingToSendData = true
         }
     }
@@ -132,7 +132,12 @@ class BluetoothHotspot: NSObject, CBPeripheralManagerDelegate {
     
     func fetchURL(url: String) {
         status("Fetching URL \(url)")
-        self.delegate?.getHTMLForURL(url)
+        self.data = NSData(contentsOfURL: NSURL(string: url)!)
+        self.dataOffset = 0
+        let dataSize = UInt64(self.data!.length)
+        let dataSizeData = NSData(bytes: [dataSize], length: 8)
+        self.onlineToSend = dataSizeData
+        self.sendChunkedData()
     }
     
     func peripheralManager(peripheral: CBPeripheralManager, didReceiveReadRequest request: CBATTRequest) {

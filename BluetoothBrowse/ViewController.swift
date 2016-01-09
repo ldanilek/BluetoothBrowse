@@ -12,13 +12,15 @@ import IOBluetoothUI
 import IOBluetooth
 import CoreBluetooth
 
-class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, WebDownloadDelegate, WebPolicyDelegate, WebResourceLoadDelegate, BluetoothReceiverDelegate, BluetoothHotspotDelegate, NSTextFieldDelegate {
+class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, WebDownloadDelegate, WebResourceLoadDelegate, WebPolicyDelegate, BluetoothReceiverDelegate, BluetoothHotspotDelegate, NSTextFieldDelegate {
     
     var webView: WebView!
     var textField: NSTextField!
     var progressBar: NSProgressIndicator!
     
     var lastURLLoaded: String?
+    var htmlLoaded: String!
+    var loadingSomething = false
     
     let receiver = BluetoothReceiver()
     //let hotspot = BluetoothHotspot()
@@ -28,7 +30,7 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
             print("Nil URL")
             return false
         }
-        self.receiver.fetchDataForURL(fieldEditor.string!)
+        self.webView.mainFrame.loadRequest(NSURLRequest(URL: NSURL(string: fieldEditor.string!)!))
         return true
     }
     
@@ -43,15 +45,63 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
                 //sender.mainFrame.loadHTMLString(cached, baseURL: url)
                 // let it load
             } else {
+                self.lastURLLoaded = url
+                self.resourceQueue = []
                 sender.stopLoading(nil)
-                self.receiver.fetchDataForURL(url)
+                if self.loadingSomething {
+                    self.resourceQueue.append(url) // load this when done loading other stuff
+                } else {
+                    self.loadingSomething = true
+                    self.receiver.fetchDataForURL(url)
+                }
             }
         }
     }
     
     func webView(sender: WebView!, didFinishLoadForFrame frame: WebFrame!) {
+        self.loadingSomething = false
         print("finished loading with title \(sender.mainFrameTitle)")
         self.view.window?.title = sender.mainFrameTitle
+        self.loadNextResource()
+    }
+    
+    func loadNextResource() {
+        while self.resourceQueue.count > 0 && alreadyDownloaded(self.resourceQueue.last!) {
+            self.resourceQueue.removeLast()
+        }
+        if self.resourceQueue.count == 0 {
+            return
+        }
+        let nextResource = self.resourceQueue.removeLast()
+        self.loadingSomething = true
+        self.receiver.fetchDataForURL(nextResource)
+    }
+    
+    var localMappings = [String: String]()
+    
+    func alreadyDownloaded(url: String) -> Bool {
+        if localMappings[url] == nil {
+            let filePath = self.findLocally(url)
+            if NSFileManager.defaultManager().fileExistsAtPath(filePath) {
+                localMappings[url] = filePath
+            }
+        }
+        return localMappings[url] != nil
+    }
+    
+    var resourceQueue = [String]()
+    
+    func webView(sender: WebView!, resource identifier: AnyObject!, willSendRequest request: NSURLRequest!, redirectResponse: NSURLResponse!, fromDataSource dataSource: WebDataSource!) -> NSURLRequest! {
+        if let locallyStored = localMappings[request.URL!.absoluteString] {
+            let newRequest = NSURLRequest(URL: NSURL(fileURLWithPath: locallyStored))
+            print("modified request \(request) into \(newRequest)")
+            return newRequest
+        }
+        print("can modify request: \(request)")
+        if !self.resourceQueue.contains(request.URL!.absoluteString) && !alreadyDownloaded(request.URL!.absoluteString) {
+            self.resourceQueue.insert(request.URL!.absoluteString, atIndex: 0)
+        }
+        return request
     }
     
     let PROGRESS_MAX: UInt64 = 1000
@@ -84,16 +134,16 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
         webView.frameLoadDelegate = self
         webView.downloadDelegate = self
         webView.policyDelegate = self
-        webView.UIDelegate = self
         webView.resourceLoadDelegate = self
+        webView.UIDelegate = self
         self.view.addSubview(webView)
         self.view.addConstraint(NSLayoutConstraint(item: webView, attribute: .Top, relatedBy: .Equal, toItem: self.progressBar, attribute: .Bottom, multiplier: 1.0, constant: 0))
         self.view.addConstraint(NSLayoutConstraint(item: webView, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0))
         self.view.addConstraint(NSLayoutConstraint(item: webView, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0))
         self.view.addConstraint(NSLayoutConstraint(item: webView, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0))
         
-        let request = NSURLRequest(URL: NSURL(string: "http://www.google.com")!)
-        self.webView.mainFrame.loadRequest(request)
+        //let request = NSURLRequest(URL: NSURL(string: "http://www.google.com")!)
+        //self.webView.mainFrame.loadRequest(request)
     }
     
     func receiverStatusUpdate(hotspot: BluetoothReceiver, update: String) {
@@ -106,11 +156,37 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
         //self.webView.mainFrame.loadHTMLString("<!DOCTYPE html><html><head><title>GOOGLE</title></head><body>"+htmlBody+"</body></html>", baseURL: nil)
     }
     
+    func findLocally(url: String) -> String {
+        let URL = NSURL(string: url)!
+        var mostPathComponents = URL.pathComponents!
+        mostPathComponents.removeLast()
+        var filePath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)[0] + "/BluetoothBrowseData/" + URL.host! + mostPathComponents.joinWithSeparator("/")
+        
+        if !NSFileManager.defaultManager().fileExistsAtPath(filePath) {
+            do {
+                try NSFileManager.defaultManager().createDirectoryAtPath(filePath, withIntermediateDirectories: true, attributes: nil)
+            }
+            catch {
+                print("Exception")
+            }
+        }
+        filePath = filePath.stringByAppendingString("/"+URL.pathComponents!.last!)
+        if filePath.hasSuffix("/") {
+            filePath = filePath.stringByAppendingString("index.html")
+        }
+        return filePath
+    }
+    
     func dataReceived(data: NSData, url: String) {
-        let htmlString = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
-        self.lastURLLoaded = url
-        //htmlBody += "<br />"+htmlString
-        self.webView.mainFrame.loadHTMLString(htmlString, baseURL: NSURL(string: url))
+        let filePath = findLocally(url)
+            
+        if data.writeToFile(filePath, atomically: true) {
+            print("Write to file path \(filePath) succeeded")
+            self.localMappings[url] = filePath
+        } else {
+            print("Write to file path \(filePath) failed")
+        }
+        self.webView.mainFrame.loadRequest(NSURLRequest(URL: NSURL(string: self.lastURLLoaded!)!))
     }
     
     func getHTMLForURL(url: String) {
