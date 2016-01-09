@@ -14,6 +14,13 @@
 		9B397A241C4084E70074E96B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B397A221C4084E70074E96B /* LaunchScreen.storyboard */; };
 		9B397A2F1C4084E70074E96B /* BluetoothHubTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A2E1C4084E70074E96B /* BluetoothHubTests.swift */; };
 		9B397A3A1C4084E70074E96B /* BluetoothHubUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A391C4084E70074E96B /* BluetoothHubUITests.swift */; };
+		9B397A461C4086FC0074E96B /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B397A451C4086FC0074E96B /* CoreBluetooth.framework */; };
+		9B397A491C4094E50074E96B /* keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A481C4094E50074E96B /* keys.swift */; };
+		9B397A4A1C4094E50074E96B /* keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A481C4094E50074E96B /* keys.swift */; };
+		9B397A4C1C409DBE0074E96B /* BluetoothHotspot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A4B1C409DBE0074E96B /* BluetoothHotspot.swift */; };
+		9B397A4D1C409DBE0074E96B /* BluetoothHotspot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B397A4B1C409DBE0074E96B /* BluetoothHotspot.swift */; };
+		9B945BA31C409F920014090E /* BluetoothReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B945BA21C409F920014090E /* BluetoothReceiver.swift */; };
+		9B945BA41C409F920014090E /* BluetoothReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B945BA21C409F920014090E /* BluetoothReceiver.swift */; };
 		9BBAD6531C2C33A200D0F5BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBAD6521C2C33A200D0F5BD /* AppDelegate.swift */; };
 		9BBAD6551C2C33A200D0F5BD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBAD6541C2C33A200D0F5BD /* ViewController.swift */; };
 		9BBAD6571C2C33A200D0F5BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BBAD6561C2C33A200D0F5BD /* Assets.xcassets */; };
@@ -70,6 +77,10 @@
 		9B397A351C4084E70074E96B /* BluetoothHubUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BluetoothHubUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B397A391C4084E70074E96B /* BluetoothHubUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothHubUITests.swift; sourceTree = "<group>"; };
 		9B397A3B1C4084E70074E96B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9B397A451C4086FC0074E96B /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.2.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
+		9B397A481C4094E50074E96B /* keys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = keys.swift; sourceTree = "<group>"; };
+		9B397A4B1C409DBE0074E96B /* BluetoothHotspot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BluetoothHotspot.swift; path = BluetoothBrowse/BluetoothHotspot.swift; sourceTree = "<group>"; };
+		9B945BA21C409F920014090E /* BluetoothReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothReceiver.swift; sourceTree = "<group>"; };
 		9BBAD64F1C2C33A200D0F5BD /* BluetoothBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BBAD6521C2C33A200D0F5BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9BBAD6541C2C33A200D0F5BD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -92,6 +103,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B397A461C4086FC0074E96B /* CoreBluetooth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +182,10 @@
 		9BBAD6461C2C33A200D0F5BD = {
 			isa = PBXGroup;
 			children = (
+				9B397A481C4094E50074E96B /* keys.swift */,
+				9B397A4B1C409DBE0074E96B /* BluetoothHotspot.swift */,
+				9B945BA21C409F920014090E /* BluetoothReceiver.swift */,
+				9B397A451C4086FC0074E96B /* CoreBluetooth.framework */,
 				9BBAD6811C2C434A00D0F5BD /* IOBluetoothUI.framework */,
 				9BBAD67F1C2C434400D0F5BD /* IOBluetooth.framework */,
 				9BBAD67D1C2C433F00D0F5BD /* CoreBluetooth.framework */,
@@ -447,7 +463,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B945BA41C409F920014090E /* BluetoothReceiver.swift in Sources */,
+				9B397A4A1C4094E50074E96B /* keys.swift in Sources */,
 				9B397A1C1C4084E70074E96B /* ViewController.swift in Sources */,
+				9B397A4D1C409DBE0074E96B /* BluetoothHotspot.swift in Sources */,
 				9B397A1A1C4084E70074E96B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -472,7 +491,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B945BA31C409F920014090E /* BluetoothReceiver.swift in Sources */,
+				9B397A491C4094E50074E96B /* keys.swift in Sources */,
 				9BBAD6551C2C33A200D0F5BD /* ViewController.swift in Sources */,
+				9B397A4C1C409DBE0074E96B /* BluetoothHotspot.swift in Sources */,
 				9BBAD6531C2C33A200D0F5BD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -805,6 +827,7 @@
 				9B397A3D1C4084E70074E96B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9B397A431C4084E70074E96B /* Build configuration list for PBXNativeTarget "BluetoothHubTests" */ = {
 			isa = XCConfigurationList;
@@ -813,6 +836,7 @@
 				9B397A3F1C4084E70074E96B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9B397A441C4084E70074E96B /* Build configuration list for PBXNativeTarget "BluetoothHubUITests" */ = {
 			isa = XCConfigurationList;
@@ -821,6 +845,7 @@
 				9B397A411C4084E70074E96B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9BBAD64A1C2C33A200D0F5BD /* Build configuration list for PBXProject "BluetoothBrowse" */ = {
 			isa = XCConfigurationList;
