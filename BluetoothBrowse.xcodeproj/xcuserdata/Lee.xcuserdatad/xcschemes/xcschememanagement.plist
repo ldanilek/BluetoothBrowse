@@ -9,9 +9,29 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>BluetoothHub.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>9B397A161C4084E70074E96B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9B397A291C4084E70074E96B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9B397A341C4084E70074E96B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>9BBAD64E1C2C33A200D0F5BD</key>
 		<dict>
 			<key>primary</key>
