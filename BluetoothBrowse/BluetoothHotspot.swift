@@ -130,14 +130,18 @@ class BluetoothHotspot: NSObject, CBPeripheralManagerDelegate {
         self.sendChunkedData()
     }
     
-    func fetchURL(url: String) {
+    func fetchURL(url: String, html: Bool) {
         status("Fetching URL \(url)")
-        self.data = NSData(contentsOfURL: NSURL(string: url)!)
-        self.dataOffset = 0
-        let dataSize = UInt64(self.data!.length)
-        let dataSizeData = NSData(bytes: [dataSize], length: 8)
-        self.onlineToSend = dataSizeData
-        self.sendChunkedData()
+        if url != self.curr {
+            self.data = NSData(contentsOfURL: NSURL(string: url)!) ?? NSData()
+            self.dataOffset = 0
+            let dataSize = UInt64(self.data!.length)
+            let dataSizeData = NSData(bytes: [dataSize], length: 8)
+            self.onlineToSend = dataSizeData
+            self.sendChunkedData()
+        } else {
+            self.delegate?.getHTMLForURL(url)
+        }
     }
     
     func peripheralManager(peripheral: CBPeripheralManager, didReceiveReadRequest request: CBATTRequest) {

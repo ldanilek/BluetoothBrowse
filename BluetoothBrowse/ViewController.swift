@@ -92,14 +92,20 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
     var resourceQueue = [String]()
     
     func webView(sender: WebView!, resource identifier: AnyObject!, willSendRequest request: NSURLRequest!, redirectResponse: NSURLResponse!, fromDataSource dataSource: WebDataSource!) -> NSURLRequest! {
+        let url = request.URL!.absoluteString
+        if hasResourceSuffix(url) && alreadyDownloaded(url) {
+            print("already downloaded \(url)")
+        }
         if let locallyStored = localMappings[request.URL!.absoluteString] {
             let newRequest = NSURLRequest(URL: NSURL(fileURLWithPath: locallyStored))
             print("modified request \(request) into \(newRequest)")
             return newRequest
         }
         print("can modify request: \(request)")
-        if !self.resourceQueue.contains(request.URL!.absoluteString) && !alreadyDownloaded(request.URL!.absoluteString) {
+        if hasResourceSuffix(request.URL!.absoluteString) {
+            if !self.resourceQueue.contains(request.URL!.absoluteString) && !alreadyDownloaded(request.URL!.absoluteString) {
             self.resourceQueue.insert(request.URL!.absoluteString, atIndex: 0)
+            }
         }
         return request
     }
@@ -178,15 +184,23 @@ class ViewController: NSViewController, WebUIDelegate, WebFrameLoadDelegate, Web
     }
     
     func dataReceived(data: NSData, url: String) {
-        let filePath = findLocally(url)
+        if hasResourceSuffix(url) {
+            let filePath = findLocally(url)
             
-        if data.writeToFile(filePath, atomically: true) {
-            print("Write to file path \(filePath) succeeded")
-            self.localMappings[url] = filePath
+            if data.writeToFile(filePath, atomically: true) {
+                print("Write to file path \(filePath) succeeded")
+                self.localMappings[url] = filePath
+            } else {
+                print("Write to file path \(filePath) failed")
+            }
+            self.webView.mainFrame.loadHTMLString(self.htmlLoaded, baseURL: NSURL(string: self.lastURLLoaded!))
         } else {
-            print("Write to file path \(filePath) failed")
+            let htmlString = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
+            self.htmlLoaded = htmlString
+            //htmlBody += "<br />"+htmlString
+            self.webView.mainFrame.loadHTMLString(htmlString, baseURL: NSURL(string: self.lastURLLoaded!))
+            print("Base url is \(url)")
         }
-        self.webView.mainFrame.loadRequest(NSURLRequest(URL: NSURL(string: self.lastURLLoaded!)!))
     }
     
     func getHTMLForURL(url: String) {
