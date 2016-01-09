@@ -147,14 +147,16 @@ class BluetoothReceiver: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
         }
     }
     
-    func fetchDataForURL(url: String) {
+    func fetchDataForURL(url: String, root: Bool) {
         status("Fetching URL")
         if self.urlCharacteristic == nil {
             status("Not connected yet")
             return
         }
         self.url = url
-        self.hotspot.writeValue(url.dataUsingEncoding(NSUTF8StringEncoding)!, forCharacteristic: self.urlCharacteristic, type: CBCharacteristicWriteType.WithResponse)
+        let data = NSMutableData(bytes: [root ? 1 : 0] as [UInt8], length: 1)
+        data.appendData(url.dataUsingEncoding(NSUTF8StringEncoding)!)
+        self.hotspot.writeValue(data, forCharacteristic: self.urlCharacteristic, type: CBCharacteristicWriteType.WithResponse)
     }
     
     func peripheral(peripheral: CBPeripheral, didWriteValueForCharacteristic characteristic: CBCharacteristic, error: NSError?) {

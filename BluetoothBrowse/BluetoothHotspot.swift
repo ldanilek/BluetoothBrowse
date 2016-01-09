@@ -130,17 +130,17 @@ class BluetoothHotspot: NSObject, CBPeripheralManagerDelegate {
         self.sendChunkedData()
     }
     
-    func fetchURL(url: String, html: Bool) {
-        status("Fetching URL \(url)")
-        if url != self.curr {
+    func fetchURL(url: String, root: Bool) {
+        if root {
+            self.delegate?.getHTMLForURL(url)
+        } else {
+            status("Fetching URL \(url)")
             self.data = NSData(contentsOfURL: NSURL(string: url)!) ?? NSData()
             self.dataOffset = 0
             let dataSize = UInt64(self.data!.length)
             let dataSizeData = NSData(bytes: [dataSize], length: 8)
             self.onlineToSend = dataSizeData
             self.sendChunkedData()
-        } else {
-            self.delegate?.getHTMLForURL(url)
         }
     }
     
@@ -183,7 +183,11 @@ class BluetoothHotspot: NSObject, CBPeripheralManagerDelegate {
                     return
                 }
                 self.urlCharacteristic.value = request.value
-                self.fetchURL(NSString(data: request.value!, encoding: NSUTF8StringEncoding) as! String)
+                var data = request.value!
+                var isRoot: UInt8 = 0
+                data.getBytes(&isRoot, length: 1)
+                data = data.subdataWithRange(NSMakeRange(1, data.length - 1))
+                self.fetchURL(NSString(data: data, encoding: NSUTF8StringEncoding) as! String, root: isRoot > 0)
                 peripheral.respondToRequest(response, withResult: CBATTError.Success)
             } else {
                 peripheral.respondToRequest(response, withResult: CBATTError.AttributeNotFound)
